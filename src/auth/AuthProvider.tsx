@@ -24,6 +24,8 @@ export interface AuthContextValue extends AuthState {
   requestMagicLink: (email: string) => Promise<{ error: string | null }>;
   resendMagicLink: () => Promise<{ error: string | null }>;
   cancelMagicLink: () => void;
+  signInWithPassword: (email: string, password: string) => Promise<{ error: string | null }>;
+  signUpWithPassword: (email: string, password: string) => Promise<{ error: string | null; needsConfirmation: boolean }>;
   signOut: () => Promise<void>;
   onSignedIn: (cb: (userId: string) => void) => () => void;
   onSignedOut: (cb: () => void) => () => void;
@@ -144,6 +146,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setState((s) => ({ ...s, status: 'signedOut', pendingEmail: null }));
   }, []);
 
+  const signInWithPassword = useCallback(
+    async (email: string, password: string): Promise<{ error: string | null }> => {
+      if (!isSupabaseConfigured) return { error: 'Sync is not configured in this build.' };
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) return { error: error.message };
+      return { error: null };
+    },
+    [],
+  );
+
+  const signUpWithPassword = useCallback(
+    async (
+      email: string,
+      password: string,
+    ): Promise<{ error: string | null; needsConfirmation: boolean }> => {
+      if (!isSupabaseConfigured)
+        return { error: 'Sync is not configured in this build.', needsConfirmation: false };
+      const { data, error } = await supabase.auth.signUp({ email, password });
+      if (error) return { error: error.message, needsConfirmation: false };
+      // If "Confirm email" is enabled in Supabase, no session is returned —
+      // the user has to click a link in their inbox first.
+      const needsConfirmation = !data.session;
+      return { error: null, needsConfirmation };
+    },
+    [],
+  );
+
   const signOut = useCallback(async () => {
     if (!isSupabaseConfigured) return;
     await supabase.auth.signOut();
@@ -170,11 +199,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       requestMagicLink,
       resendMagicLink,
       cancelMagicLink,
+      signInWithPassword,
+      signUpWithPassword,
       signOut,
       onSignedIn,
       onSignedOut,
     }),
-    [state, requestMagicLink, resendMagicLink, cancelMagicLink, signOut, onSignedIn, onSignedOut],
+    [
+      state,
+      requestMagicLink,
+      resendMagicLink,
+      cancelMagicLink,
+      signInWithPassword,
+      signUpWithPassword,
+      signOut,
+      onSignedIn,
+      onSignedOut,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
