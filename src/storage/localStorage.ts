@@ -1,5 +1,5 @@
 import type { AppState } from './schema';
-import { CURRENT_SCHEMA, STORAGE_KEY } from './schema';
+import { CURRENT_SCHEMA, STORAGE_KEY, defaultPrefs } from './schema';
 import { seedState } from './seed';
 
 export class StorageQuotaError extends Error {
@@ -55,7 +55,14 @@ export function loadState(storage: Storage = getDefaultStorage()): AppState {
     version += 1;
   }
 
-  return migrated as AppState;
+  return withPrefDefaults(migrated as AppState);
+}
+
+function withPrefDefaults(state: AppState): AppState {
+  return {
+    ...state,
+    prefs: { ...defaultPrefs, ...(state.prefs ?? {}) },
+  };
 }
 
 export function saveState(state: AppState, storage: Storage = getDefaultStorage()): void {

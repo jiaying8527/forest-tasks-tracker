@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useAppState } from '../state/store';
 import { ForestScene } from '../components/ForestScene';
 import './ForestRoute.css';
@@ -22,6 +23,12 @@ export function ForestRoute() {
       ) : null}
 
       <ForestScene trees={state.trees} />
+
+      <div className="forest-actions">
+        <Link className="btn btn-primary" to="/completed">
+          View completed tasks
+        </Link>
+      </div>
     </section>
   );
 }

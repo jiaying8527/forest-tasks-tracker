@@ -1,4 +1,4 @@
-import type { AppState, Filters, ReducedMotionPref } from '../storage/schema';
+import type { AppState, Filters, ReducedMotionPref, SortOrder } from '../storage/schema';
 
 export type Action =
   | { type: 'addTask'; title: string; description: string | null; categoryId: string; statusId: string; dueDate: string | null; id?: string; createdAt?: string }
@@ -14,6 +14,7 @@ export type Action =
   | { type: 'deleteStatus'; id: string; reassignTo: string; newCompletedStatusId?: string }
   | { type: 'setCompletedStatus'; id: string }
   | { type: 'setFilters'; filters: Filters }
+  | { type: 'setSortOrder'; order: SortOrder }
   | { type: 'setReducedMotion'; pref: ReducedMotionPref }
   | { type: 'setOnboardingDismissed'; dismissed: boolean }
   | { type: 'setLastExportAt'; at: string }

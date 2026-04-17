@@ -1,4 +1,4 @@
-import type { AppState, Filters } from '../storage/schema';
+import type { AppState, Filters, SortOrder } from '../storage/schema';
 import type { Task } from '../domain/task';
 import { bucketDueDate } from '../lib/dates';
 
@@ -8,22 +8,40 @@ export function completedStatusId(state: AppState): string {
   return s.id;
 }
 
+function compareDueAsc(a: Task, b: Task): number {
+  // dueDate ASC nulls-last, then createdAt DESC
+  const ad = a.dueDate ?? '';
+  const bd = b.dueDate ?? '';
+  if (ad && bd) {
+    if (ad !== bd) return ad < bd ? -1 : 1;
+  } else if (ad !== bd) {
+    return ad ? -1 : 1;
+  }
+  return a.createdAt < b.createdAt ? 1 : a.createdAt > b.createdAt ? -1 : 0;
+}
+
+function compareCreatedDesc(a: Task, b: Task): number {
+  return a.createdAt < b.createdAt ? 1 : a.createdAt > b.createdAt ? -1 : 0;
+}
+
+function compareCreatedAsc(a: Task, b: Task): number {
+  return a.createdAt < b.createdAt ? -1 : a.createdAt > b.createdAt ? 1 : 0;
+}
+
+export function sortTasks(tasks: Task[], order: SortOrder): Task[] {
+  const cmp =
+    order === 'createdDesc'
+      ? compareCreatedDesc
+      : order === 'createdAsc'
+        ? compareCreatedAsc
+        : compareDueAsc;
+  return tasks.slice().sort(cmp);
+}
+
 export function activeTasks(state: AppState): Task[] {
   const done = completedStatusId(state);
-  return state.tasks
-    .filter((t) => t.statusId !== done)
-    .slice()
-    .sort((a, b) => {
-      // dueDate ASC nulls-last, then createdAt DESC
-      const ad = a.dueDate ?? '';
-      const bd = b.dueDate ?? '';
-      if (ad && bd) {
-        if (ad !== bd) return ad < bd ? -1 : 1;
-      } else if (ad !== bd) {
-        return ad ? -1 : 1;
-      }
-      return a.createdAt < b.createdAt ? 1 : a.createdAt > b.createdAt ? -1 : 0;
-    });
+  const filtered = state.tasks.filter((t) => t.statusId !== done);
+  return sortTasks(filtered, state.prefs.sortOrder);
 }
 
 export function completedTasks(state: AppState): Task[] {
@@ -45,7 +63,11 @@ export function applyFilters(state: AppState, filters: Filters, now: Date = new 
     if (filters.statusId && t.statusId !== filters.statusId) return false;
     if (filters.dueBucket) {
       const bucket = bucketDueDate(t.dueDate, t.statusId === done, now);
-      if (bucket !== filters.dueBucket) return false;
+      if (filters.dueBucket === 'hasDue') {
+        if (bucket === 'none') return false;
+      } else if (bucket !== filters.dueBucket) {
+        return false;
+      }
     }
     return true;
   });

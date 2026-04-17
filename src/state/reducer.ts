@@ -262,6 +262,9 @@ export function reducer(state: AppState, action: Action): AppState {
     case 'setFilters':
       return { ...state, prefs: { ...state.prefs, lastFilters: action.filters } };
 
+    case 'setSortOrder':
+      return { ...state, prefs: { ...state.prefs, sortOrder: action.order } };
+
     case 'setReducedMotion':
       return { ...state, prefs: { ...state.prefs, reducedMotion: action.pref } };
 
