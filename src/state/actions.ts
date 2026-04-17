@@ -13,6 +13,7 @@ export type Action =
   | { type: 'renameStatus'; id: string; name: string }
   | { type: 'deleteStatus'; id: string; reassignTo: string; newCompletedStatusId?: string }
   | { type: 'setCompletedStatus'; id: string }
+  | { type: 'setStatusColor'; id: string; color: string }
   | { type: 'setFilters'; filters: Filters }
   | { type: 'setSortOrder'; order: SortOrder }
   | { type: 'setReducedMotion'; pref: ReducedMotionPref }

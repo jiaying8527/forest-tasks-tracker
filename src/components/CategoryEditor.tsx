@@ -65,17 +65,21 @@ export function CategoryEditor() {
                 </>
               ) : (
                 <>
-                  <span className="editor-name">{c.name}</span>
-                  <span className="editor-usage">{usage} tasks</span>
-                  <button
-                    className="btn btn-ghost"
-                    onClick={() => setEditing({ id: c.id, name: c.name })}
-                  >
-                    Rename
-                  </button>
-                  <button className="btn btn-ghost" onClick={() => openDelete(c.id)}>
-                    Delete
-                  </button>
+                  <div className="editor-row-main">
+                    <span className="editor-name">{c.name}</span>
+                    <span className="editor-usage">{usage} tasks</span>
+                  </div>
+                  <div className="editor-row-actions">
+                    <button
+                      className="btn btn-ghost"
+                      onClick={() => setEditing({ id: c.id, name: c.name })}
+                    >
+                      Rename
+                    </button>
+                    <button className="btn btn-ghost" onClick={() => openDelete(c.id)}>
+                      Delete
+                    </button>
+                  </div>
                 </>
               )}
             </li>

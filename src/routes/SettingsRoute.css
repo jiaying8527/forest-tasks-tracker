@@ -46,3 +46,34 @@
   margin-top: var(--sp-2);
   margin-bottom: 0;
 }
+
+.settings-collapsible {
+  padding: 0;
+}
+.settings-collapsible > .settings-summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  user-select: none;
+}
+.settings-collapsible > .settings-summary::-webkit-details-marker {
+  display: none;
+}
+.settings-summary-chevron {
+  transition: transform 0.18s ease;
+  color: var(--c-text-muted);
+  font-size: var(--fs-md);
+}
+.settings-collapsible[open] > .settings-summary .settings-summary-chevron {
+  transform: rotate(180deg);
+}
+.settings-collapsible-body {
+  padding: 0 var(--sp-4) var(--sp-4);
+  border-top: 1px solid var(--c-border);
+  padding-top: var(--sp-3);
+}

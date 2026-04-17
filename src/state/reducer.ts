@@ -259,6 +259,17 @@ export function reducer(state: AppState, action: Action): AppState {
       };
     }
 
+    case 'setStatusColor': {
+      if (!state.statuses.some((s) => s.id === action.id))
+        throw new InvariantError('Unknown status id');
+      return {
+        ...state,
+        statuses: state.statuses.map((s) =>
+          s.id === action.id ? { ...s, color: action.color } : s,
+        ),
+      };
+    }
+
     case 'setFilters':
       return { ...state, prefs: { ...state.prefs, lastFilters: action.filters } };
 

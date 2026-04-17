@@ -13,7 +13,7 @@
 }
 .editor-row {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: var(--sp-2);
   padding: var(--sp-2) var(--sp-3);
@@ -21,13 +21,23 @@
   border: 1px solid var(--c-border);
   border-radius: var(--r-md);
 }
+.editor-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
 .editor-name {
   font-weight: 600;
-  flex: 1 1 auto;
-  min-width: 120px;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .editor-badge {
-  margin-left: var(--sp-2);
   background: var(--c-accent);
   color: var(--c-accent-ink);
   border-radius: var(--r-pill);
@@ -38,7 +48,37 @@
 .editor-usage {
   color: var(--c-text-muted);
   font-size: var(--fs-xs);
-  margin-right: var(--sp-2);
+}
+.editor-row-actions {
+  display: flex;
+  gap: 2px;
+  flex: 0 0 auto;
+  align-items: center;
+}
+.editor-row-actions .btn {
+  padding: 4px var(--sp-2);
+  min-height: 32px;
+  font-size: var(--fs-sm);
+}
+.editor-color {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--c-border);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+}
+.editor-color input[type='color'] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  background: transparent;
 }
 .editor-input {
   flex: 1 1 160px;

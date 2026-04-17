@@ -27,14 +27,6 @@ export function StatusEditor() {
     setEditing(null);
   };
 
-  const designateCompleted = (id: string) => {
-    dispatch({ type: 'setCompletedStatus', id });
-    showToast({
-      kind: 'info',
-      message: 'Completed status updated — the forest now reflects the new completed status.',
-    });
-  };
-
   const openDelete = (id: string) => {
     const fallback = state.statuses.find((s) => s.id !== id);
     if (!fallback) {
@@ -87,28 +79,34 @@ export function StatusEditor() {
                 </>
               ) : (
                 <>
-                  <span className="editor-name">
-                    {s.name}
-                    {s.isCompleted ? <span className="editor-badge">completed</span> : null}
-                  </span>
-                  <span className="editor-usage">{usage} tasks</span>
-                  <button
-                    className="btn btn-ghost"
-                    onClick={() => setEditing({ id: s.id, name: s.name })}
+                  <label
+                    className="editor-color"
+                    style={{ background: s.color ?? '#94a3b8' }}
+                    aria-label={`Color for ${s.name}`}
                   >
-                    Rename
-                  </button>
-                  {!s.isCompleted ? (
+                    <input
+                      type="color"
+                      value={s.color ?? '#94a3b8'}
+                      onChange={(e) =>
+                        dispatch({ type: 'setStatusColor', id: s.id, color: e.target.value })
+                      }
+                    />
+                  </label>
+                  <div className="editor-row-main">
+                    <span className="editor-name">{s.name}</span>
+                    <span className="editor-usage">{usage} tasks</span>
+                  </div>
+                  <div className="editor-row-actions">
                     <button
                       className="btn btn-ghost"
-                      onClick={() => designateCompleted(s.id)}
+                      onClick={() => setEditing({ id: s.id, name: s.name })}
                     >
-                      Mark as completed
+                      Rename
                     </button>
-                  ) : null}
-                  <button className="btn btn-ghost" onClick={() => openDelete(s.id)}>
-                    Delete
-                  </button>
+                    <button className="btn btn-ghost" onClick={() => openDelete(s.id)}>
+                      Delete
+                    </button>
+                  </div>
                 </>
               )}
             </li>

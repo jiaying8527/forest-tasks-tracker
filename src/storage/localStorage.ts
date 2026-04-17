@@ -55,13 +55,25 @@ export function loadState(storage: Storage = getDefaultStorage()): AppState {
     version += 1;
   }
 
-  return withPrefDefaults(migrated as AppState);
+  return withPrefDefaults(repairCompletedStatus(migrated as AppState));
 }
 
 function withPrefDefaults(state: AppState): AppState {
   return {
     ...state,
     prefs: { ...defaultPrefs, ...(state.prefs ?? {}) },
+  };
+}
+
+function repairCompletedStatus(state: AppState): AppState {
+  if (!state.statuses || state.statuses.length === 0) return state;
+  const completedId =
+    state.statuses.find((s) => s.id === 'sts_completed')?.id ??
+    state.statuses.find((s) => s.name.trim().toLowerCase() === 'completed')?.id ??
+    state.statuses[state.statuses.length - 1].id;
+  return {
+    ...state,
+    statuses: state.statuses.map((s) => ({ ...s, isCompleted: s.id === completedId })),
   };
 }
 
