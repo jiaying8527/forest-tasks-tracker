@@ -1,0 +1,10 @@
+.route-forest .route-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: var(--sp-3);
+}
+.forest-count {
+  color: var(--c-text-muted);
+  font-size: var(--fs-sm);
+}

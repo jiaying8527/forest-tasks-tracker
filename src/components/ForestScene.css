@@ -1,0 +1,18 @@
+.forest-scene {
+  background: var(--c-bg-elev);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  padding: var(--sp-2);
+  box-shadow: var(--shadow-1);
+}
+.forest-scene svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.forest-density-sparse  { --canopy-glow: 0; }
+.forest-density-light   { --canopy-glow: 0; }
+.forest-density-medium  { --canopy-glow: 0; }
+.forest-density-dense   { --canopy-glow: 0; }
+.forest-density-lush    { --canopy-glow: 0; }

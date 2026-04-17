@@ -1,0 +1,44 @@
+{
+  "name": "forest-tasks-tracker",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Mobile-first personal task tracker with a magical forest reward system. All data stays in your browser.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b --noEmit && vite build",
+    "preview": "vite preview --port 4173",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.tsx",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"tests/**/*.{ts,tsx}\"",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "nanoid": "^5.0.7",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.47.2",
+    "@testing-library/jest-dom": "^6.5.0",
+    "@testing-library/react": "^16.0.1",
+    "@types/node": "^20.19.39",
+    "@types/react": "^18.3.10",
+    "@types/react-dom": "^18.3.0",
+    "@typescript-eslint/eslint-plugin": "^8.8.0",
+    "@typescript-eslint/parser": "^8.8.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "eslint": "^8.57.1",
+    "eslint-plugin-react": "^7.37.1",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "jsdom": "^25.0.1",
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.8",
+    "vite-plugin-pwa": "^0.20.5",
+    "vitest": "^2.1.1"
+  }
+}
