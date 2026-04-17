@@ -16,38 +16,51 @@ export function CategoryEditor() {
   );
 
   const dragIdRef = useRef<string | null>(null);
+  const listRef = useRef<HTMLUListElement | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
 
-  const onDragStart = (id: string) => (e: React.DragEvent) => {
+  const findRowIdAt = (clientX: number, clientY: number): string | null => {
+    const el = document.elementFromPoint(clientX, clientY);
+    if (!el || !listRef.current) return null;
+    const li = (el as HTMLElement).closest('li[data-category-id]') as HTMLElement | null;
+    if (!li || !listRef.current.contains(li)) return null;
+    return li.dataset.categoryId ?? null;
+  };
+
+  const onPointerDown = (id: string) => (e: React.PointerEvent) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    e.preventDefault();
+    e.stopPropagation();
+    (e.target as Element).setPointerCapture(e.pointerId);
     dragIdRef.current = id;
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/plain', id);
+    setOverId(id);
   };
-  const onDragOver = (id: string) => (e: React.DragEvent) => {
-    const current = dragIdRef.current;
-    if (!current || current === id) return;
+
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!dragIdRef.current) return;
     e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-    if (overId !== id) setOverId(id);
+    const overRowId = findRowIdAt(e.clientX, e.clientY);
+    if (overRowId && overRowId !== overId) {
+      setOverId(overRowId);
+    }
   };
-  const onDrop = (id: string) => (e: React.DragEvent) => {
-    const current = dragIdRef.current;
-    if (!current || current === id) return;
+
+  const onPointerUp = (e: React.PointerEvent) => {
+    if (!dragIdRef.current) return;
     e.preventDefault();
+    const current = dragIdRef.current;
+    const target = overId;
+    dragIdRef.current = null;
+    setOverId(null);
+    if (!current || !target || current === target) return;
     const ids = sortedCategories.map((c) => c.id);
     const from = ids.indexOf(current);
-    const to = ids.indexOf(id);
+    const to = ids.indexOf(target);
     if (from === -1 || to === -1) return;
     const next = ids.slice();
     next.splice(from, 1);
     next.splice(to, 0, current);
     dispatch({ type: 'reorderCategories', orderedIds: next });
-    dragIdRef.current = null;
-    setOverId(null);
-  };
-  const onDragEnd = () => {
-    dragIdRef.current = null;
-    setOverId(null);
   };
 
   const add = () => {
@@ -83,16 +96,15 @@ export function CategoryEditor() {
 
   return (
     <div className="editor">
-      <ul className="editor-list">
+      <ul className="editor-list" ref={listRef}>
         {sortedCategories.map((c) => {
           const usage = state.tasks.filter((t) => t.categoryId === c.id).length;
-          const isOver = overId === c.id;
+          const isOver = overId === c.id && dragIdRef.current !== null && dragIdRef.current !== c.id;
           return (
             <li
               key={c.id}
+              data-category-id={c.id}
               className={`editor-row${isOver ? ' is-drop-target' : ''}`}
-              onDragOver={onDragOver(c.id)}
-              onDrop={onDrop(c.id)}
             >
               {editing?.id === c.id ? (
                 <>
@@ -128,9 +140,10 @@ export function CategoryEditor() {
                   </div>
                   <span
                     className="editor-drag-handle"
-                    draggable
-                    onDragStart={onDragStart(c.id)}
-                    onDragEnd={onDragEnd}
+                    onPointerDown={onPointerDown(c.id)}
+                    onPointerMove={onPointerMove}
+                    onPointerUp={onPointerUp}
+                    onPointerCancel={onPointerUp}
                     aria-label={`Reorder ${c.name}`}
                     title="Drag to reorder"
                   >

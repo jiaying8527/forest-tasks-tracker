@@ -38,23 +38,26 @@
 .task-list-numbered {
   counter-reset: task;
   list-style: none;
+  padding: 0;
 }
 .task-list-numbered > li {
   counter-increment: task;
-  display: grid;
-  grid-template-columns: var(--sp-6) 1fr;
-  align-items: start;
-  gap: var(--sp-2);
 }
-.task-list-numbered > li::before {
+.task-list-numbered .task-card::before {
   content: counter(task) ".";
+  position: absolute;
+  top: 8px;
+  left: 10px;
   color: var(--c-text-muted);
   font-variant-numeric: tabular-nums;
-  padding-top: var(--sp-2);
-  text-align: right;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+  opacity: 0.6;
+  pointer-events: none;
   transition: opacity var(--motion-base) var(--ease-out);
 }
-.task-list-numbered > li:has(.task-card-swipe.is-completing)::before {
+.task-list-numbered .task-card-swipe.is-completing .task-card::before {
   opacity: 0;
 }
 
@@ -94,6 +97,10 @@
   color: var(--c-text-muted);
   cursor: grab;
   user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+  touch-action: none;
   letter-spacing: -2px;
   font-size: 16px;
   line-height: 1;
