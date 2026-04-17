@@ -71,6 +71,18 @@ export function clearState(storage: Storage = getDefaultStorage()): void {
   storage.removeItem(STORAGE_KEY);
 }
 
+/**
+ * Clear all cloud-synced state from this device. Called on sign-out to
+ * leave the browser in a clean signed-out condition. Does NOT touch
+ * Supabase's own auth storage (`fts.auth`) — `supabase.auth.signOut()`
+ * handles that.
+ */
+export function clearAllCloudSyncedState(
+  storage: Storage = getDefaultStorage(),
+): void {
+  storage.removeItem(STORAGE_KEY);
+}
+
 function isQuotaError(err: unknown): boolean {
   if (!err || typeof err !== 'object') return false;
   const name = (err as { name?: string }).name;

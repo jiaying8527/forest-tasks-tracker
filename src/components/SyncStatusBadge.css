@@ -1,0 +1,37 @@
+.sync-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 32px;
+  padding: 0 var(--sp-3);
+  border-radius: var(--r-pill);
+  background: var(--c-bg);
+  border: 1px solid var(--c-border);
+  color: var(--c-text-muted);
+  font-size: var(--fs-sm);
+  cursor: default;
+}
+.sync-badge:not(:disabled) {
+  cursor: pointer;
+}
+.sync-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.6;
+}
+.sync-badge-synced { color: var(--c-accent); }
+.sync-badge-synced .sync-dot { background: var(--c-accent); opacity: 1; }
+.sync-badge-syncing { color: var(--c-text-muted); }
+.sync-badge-syncing .sync-dot { animation: sync-pulse 1.2s ease-in-out infinite; }
+.sync-badge-offline { color: var(--c-warning); }
+.sync-badge-error { color: var(--c-danger); border-color: var(--c-danger); }
+
+@keyframes sync-pulse {
+  0%, 100% { opacity: 0.3; }
+  50%      { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sync-badge-syncing .sync-dot { animation: none; opacity: 1; }
+}
