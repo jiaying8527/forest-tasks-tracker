@@ -15,36 +15,20 @@ export function FilterBar() {
   const filters = state.prefs.lastFilters;
   const nonCompletedStatuses = state.statuses.filter((s) => !s.isCompleted);
 
-  const setCategory = (categoryId: string | null) =>
-    dispatch({ type: 'setFilters', filters: { ...filters, categoryId } });
   const setStatus = (statusId: string | null) =>
     dispatch({ type: 'setFilters', filters: { ...filters, statusId } });
   const setDue = (dueBucket: DueBucket | null) =>
     dispatch({ type: 'setFilters', filters: { ...filters, dueBucket } });
 
-  const hasAny = filters.categoryId || filters.statusId || filters.dueBucket;
+  const hasAny = filters.statusId || filters.dueBucket;
   const clearAll = () =>
     dispatch({
       type: 'setFilters',
-      filters: { categoryId: null, statusId: null, dueBucket: null },
+      filters: { ...filters, statusId: null, dueBucket: null },
     });
 
   return (
     <div className="filter-bar" role="toolbar" aria-label="Filters">
-      <label className="filter-select">
-        <span className="visually-hidden">Category</span>
-        <select
-          value={filters.categoryId ?? ''}
-          onChange={(e) => setCategory(e.target.value || null)}
-        >
-          <option value="">All categories</option>
-          {state.categories.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
-      </label>
       <label className="filter-select">
         <span className="visually-hidden">Status</span>
         <select

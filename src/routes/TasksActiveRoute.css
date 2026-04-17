@@ -34,3 +34,33 @@
   flex-direction: column;
   gap: var(--sp-3);
 }
+
+.task-list-numbered {
+  counter-reset: task;
+  list-style: none;
+}
+.task-list-numbered > li {
+  counter-increment: task;
+  display: grid;
+  grid-template-columns: var(--sp-6) 1fr;
+  align-items: start;
+  gap: var(--sp-2);
+}
+.task-list-numbered > li::before {
+  content: counter(task) ".";
+  color: var(--c-text-muted);
+  font-variant-numeric: tabular-nums;
+  padding-top: var(--sp-2);
+  text-align: right;
+}
+
+.task-groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+.task-group-title {
+  font-size: var(--fs-md);
+  margin: 0 0 var(--sp-2);
+  color: var(--c-text);
+}

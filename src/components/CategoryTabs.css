@@ -1,0 +1,22 @@
+.category-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--c-border);
+  padding-bottom: var(--sp-2);
+}
+.category-tab {
+  min-height: var(--tap-min);
+  padding: 0 var(--sp-3);
+  border-radius: var(--r-pill);
+  border: 1px solid var(--c-border);
+  background: var(--c-bg-elev);
+  color: var(--c-text);
+  font-size: var(--fs-sm);
+}
+.category-tab.is-active {
+  background: var(--c-accent);
+  color: var(--c-accent-ink);
+  border-color: var(--c-accent);
+}
