@@ -18,56 +18,75 @@ interface DraggableListProps {
 
 function DraggableList({ tasks, ariaLabel, enabled, onReorder }: DraggableListProps) {
   const dragIdRef = useRef<string | null>(null);
+  const listRef = useRef<HTMLOListElement | null>(null);
   const [dragId, setDragId] = useState<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
 
-  const onDragStart = (id: string) => (e: React.DragEvent) => {
+  const findRowIdAt = (clientX: number, clientY: number): string | null => {
+    const el = document.elementFromPoint(clientX, clientY);
+    if (!el || !listRef.current) return null;
+    const li = (el as HTMLElement).closest('li[data-task-id]') as HTMLElement | null;
+    if (!li || !listRef.current.contains(li)) return null;
+    return li.dataset.taskId ?? null;
+  };
+
+  const onPointerDown = (id: string) => (e: React.PointerEvent) => {
     if (!enabled) return;
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    e.preventDefault();
+    e.stopPropagation();
+    (e.target as Element).setPointerCapture(e.pointerId);
     dragIdRef.current = id;
     setDragId(id);
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/plain', id);
+    setOverId(id);
   };
-  const onDragOver = (id: string) => (e: React.DragEvent) => {
-    const current = dragIdRef.current;
-    if (!enabled || !current || current === id) return;
+
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!dragIdRef.current) return;
     e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-    if (overId !== id) setOverId(id);
+    const overRowId = findRowIdAt(e.clientX, e.clientY);
+    if (overRowId && overRowId !== overId) {
+      setOverId(overRowId);
+    }
   };
-  const onDrop = (id: string) => (e: React.DragEvent) => {
+
+  const finishDrag = () => {
     const current = dragIdRef.current;
-    if (!enabled || !current || current === id) return;
-    e.preventDefault();
+    const target = overId;
+    dragIdRef.current = null;
+    setDragId(null);
+    setOverId(null);
+    if (!current || !target || current === target) return;
     const ids = tasks.map((t) => t.id);
     const from = ids.indexOf(current);
-    const to = ids.indexOf(id);
+    const to = ids.indexOf(target);
     if (from === -1 || to === -1) return;
     const next = ids.slice();
     next.splice(from, 1);
     next.splice(to, 0, current);
     onReorder(next);
-    dragIdRef.current = null;
-    setDragId(null);
-    setOverId(null);
   };
-  const onDragEnd = () => {
-    dragIdRef.current = null;
-    setDragId(null);
-    setOverId(null);
+
+  const onPointerUp = (e: React.PointerEvent) => {
+    if (!dragIdRef.current) return;
+    e.preventDefault();
+    finishDrag();
   };
 
   return (
-    <ol className="task-list task-list-numbered" aria-label={ariaLabel}>
+    <ol
+      ref={listRef}
+      className="task-list task-list-numbered"
+      aria-label={ariaLabel}
+    >
       {tasks.map((t) => (
         <li
           key={t.id}
+          data-task-id={t.id}
           className={
             (dragId === t.id ? 'is-dragging ' : '') +
-            (overId === t.id ? 'is-drop-target' : '')
+            (overId === t.id && dragId !== t.id ? 'is-drop-target' : '')
           }
-          onDragOver={onDragOver(t.id)}
-          onDrop={onDrop(t.id)}
         >
           <TaskCard
             task={t}
@@ -75,9 +94,10 @@ function DraggableList({ tasks, ariaLabel, enabled, onReorder }: DraggableListPr
               enabled ? (
                 <span
                   className="task-drag-handle"
-                  draggable
-                  onDragStart={onDragStart(t.id)}
-                  onDragEnd={onDragEnd}
+                  onPointerDown={onPointerDown(t.id)}
+                  onPointerMove={onPointerMove}
+                  onPointerUp={onPointerUp}
+                  onPointerCancel={onPointerUp}
                   aria-label={`Reorder ${t.title}`}
                   title="Drag to reorder"
                 >
