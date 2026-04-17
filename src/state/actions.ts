@@ -14,6 +14,8 @@ export type Action =
   | { type: 'deleteStatus'; id: string; reassignTo: string; newCompletedStatusId?: string }
   | { type: 'setCompletedStatus'; id: string }
   | { type: 'setStatusColor'; id: string; color: string }
+  | { type: 'reorderTasks'; orderedIds: string[] }
+  | { type: 'reorderCategories'; orderedIds: string[] }
   | { type: 'setFilters'; filters: Filters }
   | { type: 'setSortOrder'; order: SortOrder }
   | { type: 'setReducedMotion'; pref: ReducedMotionPref }

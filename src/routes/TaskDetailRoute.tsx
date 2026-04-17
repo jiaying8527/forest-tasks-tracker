@@ -86,7 +86,7 @@ export function TaskDetailRoute() {
     const snapshot = existing;
     dispatch({ type: 'deleteTask', id: existing.id });
     showToast({
-      kind: 'info',
+      kind: 'error',
       message: 'Task deleted',
       actionLabel: 'Undo',
       onAction: () => {

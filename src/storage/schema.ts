@@ -8,7 +8,7 @@ export const STORAGE_KEY = 'fts.v1';
 
 export type DueBucket = 'today' | 'thisWeek' | 'overdue' | 'later' | 'none';
 export type DueFilter = 'hasDue' | DueBucket;
-export type SortOrder = 'dueAsc' | 'createdDesc' | 'createdAsc';
+export type SortOrder = 'dueAsc' | 'createdDesc' | 'createdAsc' | 'manual';
 export type ReducedMotionPref = 'system' | 'always' | 'never';
 
 export interface Filters {
@@ -42,7 +42,7 @@ export const emptyFilters: Filters = {
 
 export const defaultPrefs: Preferences = {
   lastFilters: emptyFilters,
-  sortOrder: 'dueAsc',
+  sortOrder: 'manual',
   reducedMotion: 'system',
   lastExportAt: null,
   onboardingDismissed: false,

@@ -270,6 +270,26 @@ export function reducer(state: AppState, action: Action): AppState {
       };
     }
 
+    case 'reorderTasks': {
+      const indexById = new Map(action.orderedIds.map((id, i) => [id, i]));
+      return {
+        ...state,
+        tasks: state.tasks.map((t) =>
+          indexById.has(t.id) ? { ...t, order: indexById.get(t.id)! } : t,
+        ),
+      };
+    }
+
+    case 'reorderCategories': {
+      const indexById = new Map(action.orderedIds.map((id, i) => [id, i]));
+      return {
+        ...state,
+        categories: state.categories.map((c) =>
+          indexById.has(c.id) ? { ...c, order: indexById.get(c.id)! } : c,
+        ),
+      };
+    }
+
     case 'setFilters':
       return { ...state, prefs: { ...state.prefs, lastFilters: action.filters } };
 

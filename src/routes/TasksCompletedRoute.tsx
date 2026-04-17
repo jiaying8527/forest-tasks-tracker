@@ -74,7 +74,7 @@ export function TasksCompletedRoute() {
     dispatch({ type: 'updateTask', id: taskId, patch: { statusId } });
     const target = statusById(state, statusId);
     showToast({
-      kind: 'info',
+      kind: 'success',
       message: target
         ? `Task restored to "${target.name}".`
         : 'Task restored to active list.',
@@ -144,7 +144,7 @@ export function TasksCompletedRoute() {
                     className="btn btn-secondary completed-uncomplete"
                     onClick={() => {
                       dispatch({ type: 'uncompleteTask', id: t.id });
-                      showToast({ kind: 'info', message: 'Task restored to active list.' });
+                      showToast({ kind: 'success', message: 'Task restored to active list.' });
                     }}
                     title={
                       priorLabel

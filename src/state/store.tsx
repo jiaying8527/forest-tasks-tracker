@@ -110,11 +110,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
   }, [state, showToast]);
 
-  // Auto-dismiss non-action toasts after 5s.
   useEffect(() => {
     if (!toast) return;
-    if (toast.onAction) return; // keep action toasts until dismissed
-    const id = setTimeout(dismissToast, 5000);
+    const ms = toast.onAction ? 6000 : 4000;
+    const id = setTimeout(dismissToast, ms);
     return () => clearTimeout(id);
   }, [toast, dismissToast]);
 

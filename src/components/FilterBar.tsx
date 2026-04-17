@@ -12,6 +12,7 @@ const sortOptions: { id: SortOrder; label: string }[] = [
   { id: 'dueAsc', label: 'Due soon' },
   { id: 'createdDesc', label: 'Newest' },
   { id: 'createdAsc', label: 'Oldest' },
+  { id: 'manual', label: 'Manual' },
 ];
 
 export function FilterBar() {

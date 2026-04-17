@@ -85,3 +85,23 @@
   position: relative;
   top: -1px;
 }
+
+.task-drag-handle {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 28px;
+  color: var(--c-text-muted);
+  cursor: grab;
+  user-select: none;
+  letter-spacing: -2px;
+  font-size: 16px;
+  line-height: 1;
+}
+.task-drag-handle:active { cursor: grabbing; }
+.task-list-numbered > li.is-dragging { opacity: 0.4; }
+.task-list-numbered > li.is-drop-target > .task-card-swipe {
+  outline: 2px dashed var(--c-accent);
+  outline-offset: 2px;
+  border-radius: var(--r-md);
+}

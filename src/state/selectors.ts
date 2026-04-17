@@ -28,13 +28,22 @@ function compareCreatedAsc(a: Task, b: Task): number {
   return a.createdAt < b.createdAt ? -1 : a.createdAt > b.createdAt ? 1 : 0;
 }
 
+function compareManual(a: Task, b: Task): number {
+  const ao = a.order ?? Number.MAX_SAFE_INTEGER;
+  const bo = b.order ?? Number.MAX_SAFE_INTEGER;
+  if (ao !== bo) return ao - bo;
+  return compareCreatedDesc(a, b);
+}
+
 export function sortTasks(tasks: Task[], order: SortOrder): Task[] {
   const cmp =
     order === 'createdDesc'
       ? compareCreatedDesc
       : order === 'createdAsc'
         ? compareCreatedAsc
-        : compareDueAsc;
+        : order === 'manual'
+          ? compareManual
+          : compareDueAsc;
   return tasks.slice().sort(cmp);
 }
 

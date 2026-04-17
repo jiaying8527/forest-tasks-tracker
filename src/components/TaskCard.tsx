@@ -1,23 +1,25 @@
-import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
 import type { Task } from '../domain/task';
 import { useAppDispatch, useAppState, useStore } from '../state/store';
 import { completedStatusId, statusById } from '../state/selectors';
 import { bucketDueDate } from '../lib/dates';
-import { shouldReduceMotion } from '../lib/reducedMotion';
 import './TaskCard.css';
 
 interface Props {
   task: Task;
+  dragHandle?: React.ReactNode;
 }
 
-const REVEAL_PX = 88;
-const OPEN_THRESHOLD = 32;
+const REVEAL_PX = 168;
+const OPEN_THRESHOLD = 48;
 
-export function TaskCard({ task }: Props) {
+export function TaskCard({ task, dragHandle }: Props) {
   const state = useAppState();
   const dispatch = useAppDispatch();
   const { showToast } = useStore();
+  const navigate = useNavigate();
   const [completing, setCompleting] = useState(false);
   const [revealed, setRevealed] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
@@ -25,21 +27,92 @@ export function TaskCard({ task }: Props) {
   const dragging = useRef(false);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
 
+  const [editing, setEditing] = useState(false);
+  const [titleDraft, setTitleDraft] = useState(task.title);
+  const [descDraft, setDescDraft] = useState(task.description ?? '');
+  const [statusPickerOpen, setStatusPickerOpen] = useState(false);
+  const statusButtonRef = useRef<HTMLButtonElement | null>(null);
+  const statusPopoverRef = useRef<HTMLUListElement | null>(null);
+  const [popoverPos, setPopoverPos] = useState<{ top: number; left: number } | null>(null);
+
+  useLayoutEffect(() => {
+    if (!statusPickerOpen) {
+      setPopoverPos(null);
+      return;
+    }
+    const btn = statusButtonRef.current;
+    if (!btn) return;
+    const r = btn.getBoundingClientRect();
+    setPopoverPos({ top: r.bottom + 6, left: Math.max(8, r.right - 200) });
+  }, [statusPickerOpen]);
+
+  useEffect(() => {
+    if (!statusPickerOpen) return;
+    const onDoc = (e: PointerEvent) => {
+      const t = e.target as Node;
+      if (statusButtonRef.current?.contains(t)) return;
+      if (statusPopoverRef.current?.contains(t)) return;
+      setStatusPickerOpen(false);
+    };
+    document.addEventListener('pointerdown', onDoc);
+    return () => document.removeEventListener('pointerdown', onDoc);
+  }, [statusPickerOpen]);
+
   const sts = statusById(state, task.statusId);
   const doneId = completedStatusId(state);
   const bucket = bucketDueDate(task.dueDate, task.statusId === doneId);
-  const reduce = shouldReduceMotion(state.prefs.reducedMotion);
+
+  const startEditing = () => {
+    setTitleDraft(task.title);
+    setDescDraft(task.description ?? '');
+    setEditing(true);
+    setRevealed(false);
+  };
+
+  const saveEdits = () => {
+    const nextTitle = titleDraft.trim();
+    if (!nextTitle) {
+      setEditing(false);
+      return;
+    }
+    const patch: { title?: string; description?: string | null } = {};
+    if (nextTitle !== task.title) patch.title = nextTitle;
+    const nextDesc = descDraft.trim();
+    const currentDesc = task.description ?? '';
+    if (nextDesc !== currentDesc) patch.description = nextDesc === '' ? null : nextDesc;
+    if (Object.keys(patch).length > 0) {
+      dispatch({ type: 'updateTask', id: task.id, patch });
+    }
+    setEditing(false);
+  };
+
+  const cancelEdits = () => {
+    setEditing(false);
+  };
+
+  const pickStatus = (statusId: string) => {
+    if (statusId !== task.statusId) {
+      dispatch({ type: 'updateTask', id: task.id, patch: { statusId } });
+    }
+    setStatusPickerOpen(false);
+  };
 
   const onComplete = () => {
     if (completing) return;
     setCompleting(true);
-    const delay = reduce ? 0 : 360;
-    window.setTimeout(() => {
-      dispatch({ type: 'completeTask', id: task.id });
-    }, delay);
+    dispatch({ type: 'completeTask', id: task.id });
+    showToast({
+      kind: 'success',
+      message: 'Task completed — a tree was planted.',
+      actionLabel: 'Undo',
+      onAction: () => {
+        dispatch({ type: 'uncompleteTask', id: task.id });
+      },
+    });
   };
 
   const onPointerDown = (e: React.PointerEvent) => {
+    if (editing) return;
     if (e.pointerType === 'mouse' && e.button !== 0) return;
     dragStartX.current = e.clientX;
     dragging.current = false;
@@ -82,12 +155,24 @@ export function TaskCard({ task }: Props) {
     return () => document.removeEventListener('pointerdown', onDocPointer);
   }, [revealed]);
 
+  useEffect(() => {
+    if (!editing) return;
+    const onDocPointer = (e: PointerEvent) => {
+      if (!wrapperRef.current) return;
+      if (!wrapperRef.current.contains(e.target as Node)) {
+        saveEdits();
+      }
+    };
+    document.addEventListener('pointerdown', onDocPointer);
+    return () => document.removeEventListener('pointerdown', onDocPointer);
+  });
+
   const onDelete = () => {
     const snapshot = task;
     setRevealed(false);
     dispatch({ type: 'deleteTask', id: task.id });
     showToast({
-      kind: 'info',
+      kind: 'error',
       message: 'Task deleted',
       actionLabel: 'Undo',
       onAction: () => {
@@ -105,26 +190,44 @@ export function TaskCard({ task }: Props) {
     });
   };
 
-  const translateX = dragStartX.current !== null && dragging.current
-    ? dragOffset
-    : revealed
-      ? -REVEAL_PX
-      : 0;
+  const translateX = editing
+    ? 0
+    : dragStartX.current !== null && dragging.current
+      ? dragOffset
+      : revealed
+        ? -REVEAL_PX
+        : 0;
 
   return (
     <div
-      className={`task-card-swipe${revealed ? ' is-revealed' : ''}${completing ? ' is-completing' : ''}`}
+      className={
+        'task-card-swipe' +
+        (revealed ? ' is-revealed' : '') +
+        (completing ? ' is-completing' : '') +
+        (editing ? ' is-editing' : '')
+      }
       ref={wrapperRef}
     >
-      <button
-        type="button"
-        className="task-card-delete"
-        onClick={onDelete}
-        aria-label={`Delete task: ${task.title}`}
-        tabIndex={revealed ? 0 : -1}
-      >
-        Delete
-      </button>
+      <div className="task-card-actions">
+        <button
+          type="button"
+          className="task-card-edit"
+          onClick={startEditing}
+          aria-label={`Edit task: ${task.title}`}
+          tabIndex={revealed ? 0 : -1}
+        >
+          Edit
+        </button>
+        <button
+          type="button"
+          className="task-card-delete"
+          onClick={onDelete}
+          aria-label={`Delete task: ${task.title}`}
+          tabIndex={revealed ? 0 : -1}
+        >
+          Delete
+        </button>
+      </div>
       <article
         className={`task-card${completing ? ' is-completing' : ''}`}
         style={{
@@ -140,44 +243,136 @@ export function TaskCard({ task }: Props) {
           className="task-complete"
           onClick={onComplete}
           aria-label={`Complete task: ${task.title}`}
-          disabled={completing}
+          disabled={completing || editing}
         >
           <span className="task-complete-ring" aria-hidden="true" />
           <span className="task-complete-check" aria-hidden="true">
             ✓
           </span>
         </button>
-        <Link to={`/task/${task.id}`} className="task-body" onClick={(e) => {
-          if (revealed || dragging.current) {
-            e.preventDefault();
-            setRevealed(false);
-          }
-        }}>
-          <span className="task-title">{task.title}</span>
-          {task.description ? (
-            <span className="task-description">{task.description}</span>
-          ) : null}
-          <span className="task-meta">
-            {task.dueDate ? (
-              <span className={`chip chip-due chip-due-${bucket}`}>
-                {renderDue(task.dueDate, bucket)}
-              </span>
-            ) : null}
-          </span>
-        </Link>
-        {sts ? (
-          <span
-            className="chip chip-status task-status-pin"
-            style={
-              sts.color
-                ? { background: sts.color, color: pickReadableInk(sts.color) }
-                : undefined
-            }
+
+        {editing ? (
+          <div className="task-body task-body-edit">
+            <input
+              className="task-title-inline"
+              value={titleDraft}
+              autoFocus
+              onChange={(e) => setTitleDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  saveEdits();
+                } else if (e.key === 'Escape') {
+                  cancelEdits();
+                }
+              }}
+              placeholder="Task title"
+            />
+            <textarea
+              className="task-description-inline"
+              value={descDraft}
+              rows={1}
+              onChange={(e) => {
+                setDescDraft(e.target.value);
+                e.target.style.height = 'auto';
+                e.target.style.height = e.target.scrollHeight + 'px';
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                  e.preventDefault();
+                  saveEdits();
+                } else if (e.key === 'Escape') {
+                  cancelEdits();
+                }
+              }}
+              placeholder="Add description"
+            />
+          </div>
+        ) : (
+          <div
+            className="task-body"
+            onClick={(e) => {
+              if (revealed || dragging.current) {
+                e.preventDefault();
+                setRevealed(false);
+                return;
+              }
+              navigate(`/task/${task.id}`);
+            }}
           >
-            {sts.name}
-          </span>
+            <span className="task-title">{task.title}</span>
+            {task.description ? (
+              <span className="task-description">{task.description}</span>
+            ) : null}
+            <span className="task-meta">
+              {task.dueDate ? (
+                <span className={`chip chip-due chip-due-${bucket}`}>
+                  {renderDue(task.dueDate, bucket)}
+                </span>
+              ) : null}
+            </span>
+          </div>
+        )}
+
+        {sts || dragHandle ? (
+          <div className="task-right-cluster">
+            {sts ? (
+              <button
+                ref={statusButtonRef}
+                type="button"
+                className="chip chip-status chip-status-button"
+                style={
+                  sts.color
+                    ? { background: sts.color, color: pickReadableInk(sts.color) }
+                    : undefined
+                }
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setStatusPickerOpen((v) => !v);
+                }}
+                aria-haspopup="listbox"
+                aria-expanded={statusPickerOpen}
+              >
+                {sts.name}
+              </button>
+            ) : null}
+            {!editing ? dragHandle : null}
+          </div>
         ) : null}
       </article>
+      {statusPickerOpen && popoverPos
+        ? createPortal(
+            <ul
+              ref={statusPopoverRef}
+              className="status-popover"
+              role="listbox"
+              style={{ top: popoverPos.top, left: popoverPos.left }}
+            >
+              {state.statuses.map((s) => (
+                <li key={s.id}>
+                  <button
+                    type="button"
+                    className={
+                      'status-popover-item' +
+                      (s.id === task.statusId ? ' is-active' : '')
+                    }
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      pickStatus(s.id);
+                    }}
+                  >
+                    <span
+                      className="status-popover-swatch"
+                      style={{ background: s.color ?? '#94a3b8' }}
+                    />
+                    {s.name}
+                  </button>
+                </li>
+              ))}
+            </ul>,
+            document.body,
+          )
+        : null}
     </div>
   );
 }
