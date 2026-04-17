@@ -39,3 +39,25 @@
   gap: var(--sp-2);
   flex-wrap: wrap;
 }
+.signin-info {
+  color: var(--c-accent);
+  font-size: var(--fs-sm);
+  margin: 0;
+}
+.signin-toggle-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  align-items: flex-start;
+}
+.signin-toggle {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--c-accent);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  text-align: left;
+}
+.signin-toggle:hover { text-decoration: underline; }
+.signin-toggle-muted { color: var(--c-text-muted); }

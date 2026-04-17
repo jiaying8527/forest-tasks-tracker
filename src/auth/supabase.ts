@@ -15,7 +15,7 @@ export const supabase: SupabaseClient = isSupabaseConfigured
         autoRefreshToken: true,
         detectSessionInUrl: false, // we handle /#/auth/callback explicitly
         storageKey: 'fts.auth',
-        flowType: 'pkce',
+        flowType: 'implicit',
       },
       realtime: { params: { eventsPerSecond: 2 } },
     })
