@@ -8,6 +8,29 @@
   color: var(--c-text-muted);
   font-size: var(--fs-sm);
 }
+.forest-range {
+  margin-bottom: var(--sp-3);
+}
+.forest-scene-wrap {
+  position: relative;
+}
+.forest-empty-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--sp-4);
+  margin: 0;
+  color: var(--c-text-muted);
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  border-radius: var(--r-lg);
+  pointer-events: none;
+}
 .forest-actions {
   display: flex;
   justify-content: center;

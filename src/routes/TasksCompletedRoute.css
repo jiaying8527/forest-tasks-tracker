@@ -4,6 +4,9 @@
   align-items: center;
   margin-bottom: var(--sp-4);
 }
+.completed-range {
+  margin-bottom: var(--sp-3);
+}
 
 .completed-list {
   list-style: none;

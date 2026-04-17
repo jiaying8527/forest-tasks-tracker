@@ -1,14 +1,64 @@
-import { useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useAppDispatch, useAppState, useStore } from '../state/store';
 import { completedTasks, categoryById, statusById } from '../state/selectors';
+import { DateRangePicker } from '../components/DateRangePicker';
+import {
+  isInRange,
+  resolveRange,
+  type DateRange,
+  type RangeSelection,
+} from '../lib/dateRange';
 import './TasksCompletedRoute.css';
+
+function isValidISODate(s: string | null): s is string {
+  return !!s && /^\d{4}-\d{2}-\d{2}$/.test(s);
+}
 
 export function TasksCompletedRoute() {
   const state = useAppState();
   const dispatch = useAppDispatch();
   const { showToast } = useStore();
-  const tasks = completedTasks(state);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const urlStart = searchParams.get('start');
+  const urlEnd = searchParams.get('end');
+
+  const [selection, setSelection] = useState<RangeSelection>({
+    granularity: 'all',
+    offset: 0,
+  });
+
+  // Effective filter range: picker's resolved range takes precedence once the
+  // user has made a selection; otherwise fall back to the URL dates (if any).
+  const pickerRange = useMemo(() => resolveRange(selection), [selection]);
+  const urlRange: DateRange | null =
+    isValidISODate(urlStart) && isValidISODate(urlEnd)
+      ? { start: urlStart, end: urlEnd }
+      : null;
+  const isAll = selection.granularity === 'all';
+  const range: DateRange =
+    !isAll ? pickerRange : urlRange ?? { start: null, end: null };
+
+  // Keep the URL in sync with the picker when the picker is driving.
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams);
+    if (!isAll && pickerRange.start && pickerRange.end) {
+      params.set('start', pickerRange.start);
+      params.set('end', pickerRange.end);
+    } else if (isAll) {
+      params.delete('start');
+      params.delete('end');
+    }
+    if (params.toString() !== searchParams.toString()) {
+      setSearchParams(params, { replace: true });
+    }
+  }, [isAll, pickerRange, searchParams, setSearchParams]);
+
+  const tasks = useMemo(
+    () => completedTasks(state).filter((t) => isInRange(t.completedAt, range)),
+    [state, range],
+  );
 
   const restoreOptions = useMemo(
     () =>
@@ -31,17 +81,27 @@ export function TasksCompletedRoute() {
     });
   };
 
+  const hasRangeFilter = !!(range.start && range.end);
+
   return (
     <section className="route-completed">
       <header className="route-header">
         <h1>Completed</h1>
-        <Link className="btn btn-primary" to="/tasks">
-          Active
+        <Link className="btn btn-primary" to="/forest">
+          Forest
         </Link>
       </header>
 
+      <div className="completed-range">
+        <DateRangePicker value={selection} onChange={setSelection} />
+      </div>
+
       {tasks.length === 0 ? (
-        <p className="empty-state">No completed tasks yet. Your forest is waiting.</p>
+        <p className="empty-state">
+          {hasRangeFilter
+            ? 'No completed tasks in this range.'
+            : 'No completed tasks yet. Your forest is waiting.'}
+        </p>
       ) : (
         <ul className="completed-list" aria-label="Completed tasks">
           {tasks.map((t) => {
