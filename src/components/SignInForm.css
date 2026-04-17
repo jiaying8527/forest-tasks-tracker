@@ -1,0 +1,41 @@
+.signin-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+.signin-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+.signin-field > span {
+  font-weight: 600;
+  font-size: var(--fs-sm);
+  color: var(--c-text-muted);
+}
+.signin-field input {
+  min-height: var(--tap-min);
+  padding: 0 var(--sp-3);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  background: var(--c-bg-elev);
+}
+.signin-hint {
+  color: var(--c-text-muted);
+  font-size: var(--fs-xs);
+  margin: 0;
+}
+.signin-error {
+  color: var(--c-danger);
+  font-size: var(--fs-sm);
+  margin: 0;
+}
+.signin-check-email h3 {
+  margin-top: 0;
+  font-size: var(--fs-lg);
+}
+.signin-actions {
+  display: flex;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+}

@@ -26,7 +26,18 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run test
-      - run: npm run build
+      - name: Build with Supabase env vars
+        env:
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
+        run: npm run build
+      - name: Verify service_role never ships
+        run: |
+          if grep -r -n --include='*.js' --include='*.css' --include='*.html' --include='*.map' service_role dist/; then
+            echo "::error::Found 'service_role' in dist/ — a server-side admin key must never ship to the browser. Rotate it in Supabase and scrub the repo."
+            exit 1
+          fi
+          echo "OK: no service_role key found in dist/"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

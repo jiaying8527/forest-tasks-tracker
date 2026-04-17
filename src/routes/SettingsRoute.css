@@ -33,6 +33,12 @@
   display: flex;
   gap: var(--sp-2);
   flex-wrap: wrap;
+  align-items: center;
+}
+.settings-signed-in {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
 }
 .settings-meta {
   color: var(--c-text-muted);

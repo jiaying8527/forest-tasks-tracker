@@ -29,6 +29,19 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Ship Supabase as its own chunk so the core v1 bundle stays
+          // lean. Signed-out sessions never need to parse this code
+          // because the client is only instantiated when env vars are
+          // present AND the user is signed in.
+          supabase: ['@supabase/supabase-js'],
+        },
+      },
+    },
+  },
   test: {
     globals: true,
     environment: 'jsdom',

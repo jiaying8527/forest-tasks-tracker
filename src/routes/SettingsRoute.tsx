@@ -1,7 +1,12 @@
 import { useRef } from 'react';
 import { useAppDispatch, useAppState, useStore } from '../state/store';
+import { useAuth } from '../auth/useAuth';
+import { isSupabaseConfigured } from '../auth/supabase';
 import { CategoryEditor } from '../components/CategoryEditor';
 import { StatusEditor } from '../components/StatusEditor';
+import { SignInForm } from '../components/SignInForm';
+import { SignOutButton } from '../components/SignOutButton';
+import { SyncStatusBadge } from '../components/SyncStatusBadge';
 import { exportToBlob, triggerDownload, parseImport } from '../lib/exportImport';
 import { nowLocalISO } from '../lib/dates';
 import './SettingsRoute.css';
@@ -10,6 +15,7 @@ export function SettingsRoute() {
   const state = useAppState();
   const dispatch = useAppDispatch();
   const { showToast } = useStore();
+  const auth = useAuth();
   const fileRef = useRef<HTMLInputElement>(null);
 
   const onExport = () => {
@@ -47,6 +53,26 @@ export function SettingsRoute() {
   return (
     <section className="route-settings">
       <h1>Settings</h1>
+
+      {isSupabaseConfigured ? (
+        <section className="settings-block">
+          <h2>Sync across devices</h2>
+          {auth.status === 'signedIn' ? (
+            <div className="settings-signed-in">
+              <p className="settings-hint">
+                Signed in as <strong>{auth.email}</strong>. Your tasks sync
+                automatically across devices when you're online.
+              </p>
+              <div className="settings-actions">
+                <SyncStatusBadge />
+                <SignOutButton />
+              </div>
+            </div>
+          ) : (
+            <SignInForm />
+          )}
+        </section>
+      ) : null}
 
       <section className="settings-block">
         <h2>Categories</h2>
