@@ -69,8 +69,7 @@ export function SyncProvider({ children }: { children: ReactNode }) {
       hasLocalUserData,
       promptReplaceLocal: async () =>
         window.confirm(
-          'Signing in will replace your current device data with your cloud data. ' +
-            'Tip: cancel, export your local data from Settings, then sign in again.',
+          'Signing in will replace your current device data with your cloud data. ',
         ),
     });
 
