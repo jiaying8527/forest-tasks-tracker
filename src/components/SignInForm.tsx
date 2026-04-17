@@ -210,16 +210,6 @@ export function SignInForm() {
         >
           {mode === 'signIn' ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
         </button>
-        <button
-          type="button"
-          className="signin-toggle signin-toggle-muted"
-          onClick={() => {
-            setMode('magic');
-            resetMessages();
-          }}
-        >
-          Email me a magic link
-        </button>
       </div>
       {error ? (
         <p className="signin-error" role="alert">
