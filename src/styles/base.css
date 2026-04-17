@@ -79,9 +79,11 @@ a { color: var(--c-accent); }
   padding: 0 var(--sp-4);
   border-radius: var(--r-md);
   font-weight: 600;
+  text-decoration: none;
   transition: background var(--motion-fast) var(--ease-out),
               transform var(--motion-fast) var(--ease-out);
 }
+.btn:hover { text-decoration: none; }
 .btn-primary {
   background: var(--c-accent);
   color: var(--c-accent-ink);

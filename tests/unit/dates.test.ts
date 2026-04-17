@@ -17,16 +17,16 @@ describe('bucketDueDate', () => {
     expect(bucketDueDate('2026-04-23', false, fixed)).toBe('thisWeek');
   });
 
-  it('returns none for 7+ days out', () => {
-    expect(bucketDueDate('2026-04-24', false, fixed)).toBe('none');
+  it('returns later for 7+ days out', () => {
+    expect(bucketDueDate('2026-04-24', false, fixed)).toBe('later');
   });
 
   it('returns overdue for past dates when not completed', () => {
     expect(bucketDueDate('2026-04-16', false, fixed)).toBe('overdue');
   });
 
-  it('suppresses overdue for completed tasks', () => {
-    expect(bucketDueDate('2026-04-16', true, fixed)).toBe('none');
+  it('suppresses overdue for completed tasks (classifies as later)', () => {
+    expect(bucketDueDate('2026-04-16', true, fixed)).toBe('later');
   });
 });
 

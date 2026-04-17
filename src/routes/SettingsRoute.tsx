@@ -1,5 +1,5 @@
-import { useRef } from 'react';
-import { useAppDispatch, useAppState, useStore } from '../state/store';
+// import { useRef } from 'react';
+// import { useAppDispatch, useAppState, useStore } from '../state/store';
 import { useAuth } from '../auth/useAuth';
 import { isSupabaseConfigured } from '../auth/supabase';
 import { CategoryEditor } from '../components/CategoryEditor';
@@ -7,48 +7,48 @@ import { StatusEditor } from '../components/StatusEditor';
 import { SignInForm } from '../components/SignInForm';
 import { SignOutButton } from '../components/SignOutButton';
 import { SyncStatusBadge } from '../components/SyncStatusBadge';
-import { exportToBlob, triggerDownload, parseImport } from '../lib/exportImport';
-import { nowLocalISO } from '../lib/dates';
+// import { exportToBlob, triggerDownload, parseImport } from '../lib/exportImport';
+// import { nowLocalISO } from '../lib/dates';
 import './SettingsRoute.css';
 
 export function SettingsRoute() {
-  const state = useAppState();
-  const dispatch = useAppDispatch();
-  const { showToast } = useStore();
+  // const state = useAppState();
+  // const dispatch = useAppDispatch();
+  // const { showToast } = useStore();
   const auth = useAuth();
-  const fileRef = useRef<HTMLInputElement>(null);
+  // const fileRef = useRef<HTMLInputElement>(null);
 
-  const onExport = () => {
-    const blob = exportToBlob(state);
-    const stamp = new Date().toISOString().slice(0, 10);
-    triggerDownload(blob, `forest-tasks-tracker-${stamp}.json`);
-    dispatch({ type: 'setLastExportAt', at: nowLocalISO() });
-    showToast({ kind: 'success', message: 'Exported your data.' });
-  };
+  // const onExport = () => {
+  //   const blob = exportToBlob(state);
+  //   const stamp = new Date().toISOString().slice(0, 10);
+  //   triggerDownload(blob, `forest-tasks-tracker-${stamp}.json`);
+  //   dispatch({ type: 'setLastExportAt', at: nowLocalISO() });
+  //   showToast({ kind: 'success', message: 'Exported your data.' });
+  // };
 
-  const onPickImport = () => fileRef.current?.click();
+  // const onPickImport = () => fileRef.current?.click();
 
-  const onImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    e.target.value = '';
-    if (!file) return;
-    const text = await file.text();
-    const result = parseImport(text);
-    if (!result.ok) {
-      showToast({ kind: 'error', message: `Import failed: ${result.error}` });
-      return;
-    }
-    const confirmed = window.confirm(
-      'Importing will replace your current tasks, categories, statuses, and forest with the contents of this file. This cannot be undone.',
-    );
-    if (!confirmed) return;
-    dispatch({ type: 'replaceState', state: result.state });
-    const s = result.state;
-    showToast({
-      kind: 'success',
-      message: `Restored ${s.tasks.length} tasks, ${s.categories.length} categories, ${s.statuses.length} statuses, ${s.trees.length} trees.`,
-    });
-  };
+  // const onImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   e.target.value = '';
+  //   if (!file) return;
+  //   const text = await file.text();
+  //   const result = parseImport(text);
+  //   if (!result.ok) {
+  //     showToast({ kind: 'error', message: `Import failed: ${result.error}` });
+  //     return;
+  //   }
+  //   const confirmed = window.confirm(
+  //     'Importing will replace your current tasks, categories, statuses, and forest with the contents of this file. This cannot be undone.',
+  //   );
+  //   if (!confirmed) return;
+  //   dispatch({ type: 'replaceState', state: result.state });
+  //   const s = result.state;
+  //   showToast({
+  //     kind: 'success',
+  //     message: `Restored ${s.tasks.length} tasks, ${s.categories.length} categories, ${s.statuses.length} statuses, ${s.trees.length} trees.`,
+  //   });
+  // };
 
   return (
     <section className="route-settings">
@@ -74,16 +74,27 @@ export function SettingsRoute() {
         </section>
       ) : null}
 
-      <section className="settings-block">
-        <h2>Categories</h2>
-        <CategoryEditor />
-      </section>
+      <details className="settings-block settings-collapsible">
+        <summary className="settings-summary">
+          <span>Categories</span>
+          <span className="settings-summary-chevron" aria-hidden="true">▾</span>
+        </summary>
+        <div className="settings-collapsible-body">
+          <CategoryEditor />
+        </div>
+      </details>
 
-      <section className="settings-block">
-        <h2>Statuses</h2>
-        <StatusEditor />
-      </section>
+      <details className="settings-block settings-collapsible">
+        <summary className="settings-summary">
+          <span>Statuses</span>
+          <span className="settings-summary-chevron" aria-hidden="true">▾</span>
+        </summary>
+        <div className="settings-collapsible-body">
+          <StatusEditor />
+        </div>
+      </details>
 
+      {/*
       <section className="settings-block">
         <h2>Motion</h2>
         <label className="settings-field">
@@ -103,7 +114,9 @@ export function SettingsRoute() {
           </select>
         </label>
       </section>
+      */}
 
+      {/*
       <section className="settings-block">
         <h2>Backup</h2>
         <p className="settings-hint">
@@ -129,6 +142,7 @@ export function SettingsRoute() {
           <p className="settings-meta">Last exported: {state.prefs.lastExportAt.slice(0, 10)}</p>
         ) : null}
       </section>
+      */}
     </section>
   );
 }

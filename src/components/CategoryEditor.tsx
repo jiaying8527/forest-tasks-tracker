@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useAppDispatch, useAppState, useStore } from '../state/store';
 import './Editor.css';
 
@@ -9,6 +9,46 @@ export function CategoryEditor() {
   const [newName, setNewName] = useState('');
   const [editing, setEditing] = useState<{ id: string; name: string } | null>(null);
   const [pendingDelete, setPendingDelete] = useState<{ id: string; reassignTo: string } | null>(null);
+
+  const sortedCategories = useMemo(
+    () => [...state.categories].sort((a, b) => a.order - b.order),
+    [state.categories],
+  );
+
+  const dragIdRef = useRef<string | null>(null);
+  const [overId, setOverId] = useState<string | null>(null);
+
+  const onDragStart = (id: string) => (e: React.DragEvent) => {
+    dragIdRef.current = id;
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', id);
+  };
+  const onDragOver = (id: string) => (e: React.DragEvent) => {
+    const current = dragIdRef.current;
+    if (!current || current === id) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (overId !== id) setOverId(id);
+  };
+  const onDrop = (id: string) => (e: React.DragEvent) => {
+    const current = dragIdRef.current;
+    if (!current || current === id) return;
+    e.preventDefault();
+    const ids = sortedCategories.map((c) => c.id);
+    const from = ids.indexOf(current);
+    const to = ids.indexOf(id);
+    if (from === -1 || to === -1) return;
+    const next = ids.slice();
+    next.splice(from, 1);
+    next.splice(to, 0, current);
+    dispatch({ type: 'reorderCategories', orderedIds: next });
+    dragIdRef.current = null;
+    setOverId(null);
+  };
+  const onDragEnd = () => {
+    dragIdRef.current = null;
+    setOverId(null);
+  };
 
   const add = () => {
     const name = newName.trim();
@@ -44,10 +84,16 @@ export function CategoryEditor() {
   return (
     <div className="editor">
       <ul className="editor-list">
-        {state.categories.map((c) => {
+        {sortedCategories.map((c) => {
           const usage = state.tasks.filter((t) => t.categoryId === c.id).length;
+          const isOver = overId === c.id;
           return (
-            <li key={c.id} className="editor-row">
+            <li
+              key={c.id}
+              className={`editor-row${isOver ? ' is-drop-target' : ''}`}
+              onDragOver={onDragOver(c.id)}
+              onDrop={onDrop(c.id)}
+            >
               {editing?.id === c.id ? (
                 <>
                   <input
@@ -65,17 +111,31 @@ export function CategoryEditor() {
                 </>
               ) : (
                 <>
-                  <span className="editor-name">{c.name}</span>
-                  <span className="editor-usage">{usage} tasks</span>
-                  <button
-                    className="btn btn-ghost"
-                    onClick={() => setEditing({ id: c.id, name: c.name })}
+                  <div className="editor-row-main">
+                    <span className="editor-name">{c.name}</span>
+                    <span className="editor-usage">{usage} tasks</span>
+                  </div>
+                  <div className="editor-row-actions">
+                    <button
+                      className="btn btn-ghost"
+                      onClick={() => setEditing({ id: c.id, name: c.name })}
+                    >
+                      Rename
+                    </button>
+                    <button className="btn btn-ghost" onClick={() => openDelete(c.id)}>
+                      Delete
+                    </button>
+                  </div>
+                  <span
+                    className="editor-drag-handle"
+                    draggable
+                    onDragStart={onDragStart(c.id)}
+                    onDragEnd={onDragEnd}
+                    aria-label={`Reorder ${c.name}`}
+                    title="Drag to reorder"
                   >
-                    Rename
-                  </button>
-                  <button className="btn btn-ghost" onClick={() => openDelete(c.id)}>
-                    Delete
-                  </button>
+                    ⋮⋮
+                  </span>
                 </>
               )}
             </li>

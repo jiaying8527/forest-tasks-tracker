@@ -4,6 +4,9 @@
   align-items: center;
   margin-bottom: var(--sp-4);
 }
+.completed-range {
+  margin-bottom: var(--sp-3);
+}
 
 .completed-list {
   list-style: none;
@@ -15,17 +18,18 @@
 }
 .completed-item {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
   gap: var(--sp-3);
   background: var(--c-surface);
   padding: var(--sp-3) var(--sp-4);
   border-radius: var(--r-md);
   border: 1px solid var(--c-border);
+  min-width: 0;
 }
 .completed-main {
   display: flex;
   flex-direction: column;
+  gap: 2px;
   min-width: 0;
 }
 .completed-title {
@@ -37,4 +41,45 @@
 .completed-meta {
   color: var(--c-text-muted);
   font-size: var(--fs-sm);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
+.completed-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.completed-restore {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  min-height: var(--tap-min);
+  padding: 0 var(--sp-2);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-pill);
+  background: var(--c-bg-elev);
+}
+.completed-restore select {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font-size: var(--fs-sm);
+  color: var(--c-text);
+  text-overflow: ellipsis;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+                    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 10px) 50%, calc(100% - 6px) 50%;
+  background-size: 4px 4px, 4px 4px;
+  background-repeat: no-repeat;
+  padding-right: 16px;
+}
+.completed-uncomplete { flex: 0 0 auto; }

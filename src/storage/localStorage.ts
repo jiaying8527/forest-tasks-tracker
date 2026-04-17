@@ -1,5 +1,5 @@
 import type { AppState } from './schema';
-import { CURRENT_SCHEMA, STORAGE_KEY } from './schema';
+import { CURRENT_SCHEMA, STORAGE_KEY, defaultPrefs } from './schema';
 import { seedState } from './seed';
 
 export class StorageQuotaError extends Error {
@@ -55,7 +55,26 @@ export function loadState(storage: Storage = getDefaultStorage()): AppState {
     version += 1;
   }
 
-  return migrated as AppState;
+  return withPrefDefaults(repairCompletedStatus(migrated as AppState));
+}
+
+function withPrefDefaults(state: AppState): AppState {
+  return {
+    ...state,
+    prefs: { ...defaultPrefs, ...(state.prefs ?? {}) },
+  };
+}
+
+function repairCompletedStatus(state: AppState): AppState {
+  if (!state.statuses || state.statuses.length === 0) return state;
+  const completedId =
+    state.statuses.find((s) => s.id === 'sts_completed')?.id ??
+    state.statuses.find((s) => s.name.trim().toLowerCase() === 'completed')?.id ??
+    state.statuses[state.statuses.length - 1].id;
+  return {
+    ...state,
+    statuses: state.statuses.map((s) => ({ ...s, isCompleted: s.id === completedId })),
+  };
 }
 
 export function saveState(state: AppState, storage: Storage = getDefaultStorage()): void {

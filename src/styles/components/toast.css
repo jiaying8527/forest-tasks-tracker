@@ -1,27 +1,82 @@
 .toast {
   position: fixed;
   left: 50%;
-  bottom: calc(var(--tap-min) + var(--sp-6) + var(--safe-bottom));
-  transform: translateX(-50%);
+  bottom: calc(var(--tap-min) + var(--sp-5) + var(--safe-bottom));
+  transform: translate(-50%, 0);
   background: var(--c-text);
   color: #fff;
-  padding: var(--sp-3) var(--sp-4);
-  border-radius: var(--r-md);
+  padding: var(--sp-3) var(--sp-3) var(--sp-3) var(--sp-4);
+  border-radius: 14px;
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  box-shadow: var(--shadow-2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
   z-index: 50;
-  max-width: calc(100% - var(--sp-6));
+  width: min(calc(100% - var(--sp-5) * 2), 420px);
+  font-size: var(--fs-sm);
+  line-height: 1.35;
+  animation: toast-in 220ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.toast-error {
+  background: #f3d1ce;
+  color: var(--c-danger);
+}
+.toast-error .toast-action {
+  background: rgba(192, 57, 43, 0.15);
+  color: var(--c-danger);
+}
+.toast-error .toast-action:hover {
+  background: rgba(192, 57, 43, 0.25);
+}
+.toast-error .toast-dismiss {
+  color: var(--c-danger);
+}
+.toast-error .toast-dismiss:hover {
+  background: rgba(192, 57, 43, 0.12);
+}
+.toast-success { background: var(--c-accent); }
+.toast-message {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.toast-action {
+  flex: 0 0 auto;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  padding: 6px 12px;
+  border-radius: var(--r-pill);
+  cursor: pointer;
   font-size: var(--fs-sm);
 }
-.toast-error { background: var(--c-danger); }
-.toast-success { background: var(--c-accent); }
-.toast-message { flex: 1 1 auto; }
-.toast-action { color: #fff; font-weight: 600; }
+.toast-action:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
 .toast-dismiss {
+  flex: 0 0 auto;
+  background: transparent;
+  border: none;
   color: #fff;
-  font-size: var(--fs-lg);
-  padding: 0 var(--sp-2);
-  min-height: var(--tap-min);
+  opacity: 0.7;
+  font-size: var(--fs-md);
+  line-height: 1;
+  padding: 6px;
+  cursor: pointer;
+  border-radius: 50%;
+}
+.toast-dismiss:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+@keyframes toast-in {
+  from {
+    transform: translate(-50%, 16px);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
 }

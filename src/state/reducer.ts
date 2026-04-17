@@ -259,8 +259,42 @@ export function reducer(state: AppState, action: Action): AppState {
       };
     }
 
+    case 'setStatusColor': {
+      if (!state.statuses.some((s) => s.id === action.id))
+        throw new InvariantError('Unknown status id');
+      return {
+        ...state,
+        statuses: state.statuses.map((s) =>
+          s.id === action.id ? { ...s, color: action.color } : s,
+        ),
+      };
+    }
+
+    case 'reorderTasks': {
+      const indexById = new Map(action.orderedIds.map((id, i) => [id, i]));
+      return {
+        ...state,
+        tasks: state.tasks.map((t) =>
+          indexById.has(t.id) ? { ...t, order: indexById.get(t.id)! } : t,
+        ),
+      };
+    }
+
+    case 'reorderCategories': {
+      const indexById = new Map(action.orderedIds.map((id, i) => [id, i]));
+      return {
+        ...state,
+        categories: state.categories.map((c) =>
+          indexById.has(c.id) ? { ...c, order: indexById.get(c.id)! } : c,
+        ),
+      };
+    }
+
     case 'setFilters':
       return { ...state, prefs: { ...state.prefs, lastFilters: action.filters } };
+
+    case 'setSortOrder':
+      return { ...state, prefs: { ...state.prefs, sortOrder: action.order } };
 
     case 'setReducedMotion':
       return { ...state, prefs: { ...state.prefs, reducedMotion: action.pref } };

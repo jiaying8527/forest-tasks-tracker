@@ -34,3 +34,74 @@
   flex-direction: column;
   gap: var(--sp-3);
 }
+
+.task-list-numbered {
+  counter-reset: task;
+  list-style: none;
+}
+.task-list-numbered > li {
+  counter-increment: task;
+  display: grid;
+  grid-template-columns: var(--sp-6) 1fr;
+  align-items: start;
+  gap: var(--sp-2);
+}
+.task-list-numbered > li::before {
+  content: counter(task) ".";
+  color: var(--c-text-muted);
+  font-variant-numeric: tabular-nums;
+  padding-top: var(--sp-2);
+  text-align: right;
+  transition: opacity var(--motion-base) var(--ease-out);
+}
+.task-list-numbered > li:has(.task-card-swipe.is-completing)::before {
+  opacity: 0;
+}
+
+.task-groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+.task-group-title {
+  font-size: var(--fs-md);
+  margin: 0 0 var(--sp-2);
+  color: var(--c-text);
+}
+
+.btn-add-task {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1;
+}
+.btn-add-task-plus {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1em;
+  line-height: 1;
+  font-weight: 700;
+  position: relative;
+  top: -1px;
+}
+
+.task-drag-handle {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 28px;
+  color: var(--c-text-muted);
+  cursor: grab;
+  user-select: none;
+  letter-spacing: -2px;
+  font-size: 16px;
+  line-height: 1;
+}
+.task-drag-handle:active { cursor: grabbing; }
+.task-list-numbered > li.is-dragging { opacity: 0.4; }
+.task-list-numbered > li.is-drop-target > .task-card-swipe {
+  outline: 2px dashed var(--c-accent);
+  outline-offset: 2px;
+  border-radius: var(--r-md);
+}

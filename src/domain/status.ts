@@ -6,4 +6,5 @@ export interface Status {
   order: number;
   isSeeded: boolean;
   isCompleted: boolean;
+  color?: string;
 }

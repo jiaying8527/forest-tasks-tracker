@@ -41,8 +41,8 @@ export function bucketDueDate(
   const parsed = parseDateOnly(dueDate);
   if (!parsed) return 'none';
   const diff = daysBetween(parsed, now);
-  if (diff < 0) return isCompleted ? 'none' : 'overdue';
+  if (diff < 0) return isCompleted ? 'later' : 'overdue';
   if (diff === 0) return 'today';
   if (diff <= 6) return 'thisWeek';
-  return 'none';
+  return 'later';
 }

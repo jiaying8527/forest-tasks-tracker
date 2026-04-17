@@ -29,6 +29,7 @@ export function seedState(): AppState {
         order: 0,
         isSeeded: true,
         isCompleted: false,
+        color: '#3b82f6',
       },
       {
         id: SEED_STATUS_IDS.inProgress,
@@ -36,6 +37,7 @@ export function seedState(): AppState {
         order: 1,
         isSeeded: true,
         isCompleted: false,
+        color: '#eab308',
       },
       {
         id: SEED_STATUS_IDS.completed,
@@ -43,6 +45,7 @@ export function seedState(): AppState {
         order: 2,
         isSeeded: true,
         isCompleted: true,
+        color: '#22c55e',
       },
     ],
     trees: [],

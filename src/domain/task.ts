@@ -13,4 +13,5 @@ export interface Task {
   dueDate: string | null; // YYYY-MM-DD
   completedAt: string | null;
   priorStatusId: StatusId | null;
+  order?: number;
 }
