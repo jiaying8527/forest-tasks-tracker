@@ -1,0 +1,17 @@
+.tree {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: tree-sway 5.5s ease-in-out infinite;
+  animation-delay: var(--sway-delay, 0s);
+}
+
+@keyframes tree-sway {
+  0%   { transform: rotate(-0.8deg); }
+  50%  { transform: rotate(0.8deg); }
+  100% { transform: rotate(-0.8deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tree { animation: none; }
+}
+.reduce-motion .tree { animation: none; }

@@ -1,0 +1,75 @@
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+.editor-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.editor-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--c-bg);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+}
+.editor-name {
+  font-weight: 600;
+  flex: 1 1 auto;
+  min-width: 120px;
+}
+.editor-badge {
+  margin-left: var(--sp-2);
+  background: var(--c-accent);
+  color: var(--c-accent-ink);
+  border-radius: var(--r-pill);
+  padding: 2px var(--sp-2);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+}
+.editor-usage {
+  color: var(--c-text-muted);
+  font-size: var(--fs-xs);
+  margin-right: var(--sp-2);
+}
+.editor-input {
+  flex: 1 1 160px;
+  min-height: var(--tap-min);
+  padding: 0 var(--sp-3);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  background: var(--c-bg-elev);
+}
+.editor-add {
+  display: flex;
+  gap: var(--sp-2);
+}
+.editor-confirm {
+  margin-top: var(--sp-3);
+  padding: var(--sp-3);
+  background: var(--c-accent-soft);
+  border-radius: var(--r-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.editor-confirm select {
+  min-height: var(--tap-min);
+  padding: 0 var(--sp-3);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  background: var(--c-bg-elev);
+}
+.editor-confirm-actions {
+  display: flex;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+}

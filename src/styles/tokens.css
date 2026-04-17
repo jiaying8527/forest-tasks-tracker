@@ -1,0 +1,61 @@
+:root {
+  /* Palette — calm forest */
+  --c-bg:            #f4f7f3;
+  --c-bg-elev:       #ffffff;
+  --c-surface:       #ffffff;
+  --c-border:        #e1e7df;
+  --c-text:          #1f2a22;
+  --c-text-muted:    #5a6a60;
+  --c-accent:        #3a7d54;
+  --c-accent-ink:    #ffffff;
+  --c-accent-soft:   #d7ead9;
+  --c-danger:        #b2423b;
+  --c-warning:       #c98a36;
+  --c-canopy-1:      #7cc28a;
+  --c-canopy-2:      #58a76e;
+  --c-canopy-3:      #3f8256;
+  --c-trunk:         #5a3826;
+  --c-sky:           #eaf3ef;
+  --c-earth:         #e7dcc9;
+
+  /* Spacing (4px base) */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.25rem;
+  --sp-6: 1.5rem;
+  --sp-8: 2rem;
+  --sp-10: 2.5rem;
+
+  /* Radii */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
+  --r-pill: 999px;
+
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.875rem;
+  --fs-md: 1rem;
+  --fs-lg: 1.125rem;
+  --fs-xl: 1.375rem;
+  --fs-2xl: 1.75rem;
+  --lh-tight: 1.2;
+  --lh-normal: 1.5;
+
+  /* Elevation */
+  --shadow-1: 0 1px 2px rgba(31, 42, 34, 0.08);
+  --shadow-2: 0 4px 12px rgba(31, 42, 34, 0.10);
+
+  /* Motion */
+  --motion-fast: 120ms;
+  --motion-base: 220ms;
+  --motion-slow: 420ms;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Touch targets */
+  --tap-min: 44px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}

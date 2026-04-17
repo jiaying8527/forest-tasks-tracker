@@ -1,0 +1,38 @@
+.task-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.form-field > span {
+  font-weight: 600;
+  font-size: var(--fs-sm);
+  color: var(--c-text-muted);
+}
+.form-field input,
+.form-field select,
+.form-field textarea {
+  min-height: var(--tap-min);
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  background: var(--c-bg-elev);
+}
+.form-field textarea {
+  min-height: calc(var(--tap-min) * 2);
+  resize: vertical;
+}
+.form-actions {
+  display: flex;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+}
+.form-delete { margin-left: auto; }
+.form-error {
+  color: var(--c-danger);
+  margin: 0;
+}
