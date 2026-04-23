@@ -11,6 +11,10 @@ body,
   margin: 0;
 }
 
+html {
+  color-scheme: light dark;
+}
+
 body {
   font-family: var(--font-sans);
   font-size: var(--fs-md);
@@ -90,7 +94,7 @@ a { color: var(--c-accent); }
   background: var(--c-accent);
   color: var(--c-accent-ink);
 }
-.btn-primary:hover { background: #2f6c47; }
+.btn-primary:hover { filter: brightness(0.92); }
 .btn-secondary {
   background: var(--c-surface);
   color: var(--c-text);

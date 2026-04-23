@@ -35,7 +35,7 @@
   color: var(--c-accent);
 }
 .task-card-delete {
-  background: #f3d1ce;
+  background: var(--c-overdue-bg);
   color: var(--c-danger);
 }
 .task-card-edit:focus-visible,
@@ -160,7 +160,7 @@
   gap: var(--sp-2);
 }
 .chip-due { background: var(--c-earth); color: var(--c-text); }
-.chip-due-overdue { background: #f3d1ce; color: var(--c-danger); }
+.chip-due-overdue { background: var(--c-overdue-bg); color: var(--c-danger); }
 .chip-due-today { background: var(--c-accent); color: var(--c-accent-ink); }
 
 @media (max-width: 480px) {
