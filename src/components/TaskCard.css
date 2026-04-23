@@ -142,8 +142,15 @@
   background: var(--c-accent-soft);
   color: var(--c-text);
   line-height: 1.4;
+  white-space: nowrap;
 }
-.chip-status { background: var(--c-border); color: var(--c-text-muted); }
+.chip-status {
+  background: var(--c-border);
+  color: var(--c-text-muted);
+  max-width: 10em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .task-right-cluster {
   flex: 0 0 auto;
   align-self: center;
@@ -155,6 +162,12 @@
 .chip-due { background: var(--c-earth); color: var(--c-text); }
 .chip-due-overdue { background: #f3d1ce; color: var(--c-danger); }
 .chip-due-today { background: var(--c-accent); color: var(--c-accent-ink); }
+
+@media (max-width: 480px) {
+  .chip-status {
+    max-width: 7em;
+  }
+}
 
 .task-body { cursor: pointer; }
 .task-body-edit {

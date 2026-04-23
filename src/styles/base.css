@@ -68,6 +68,8 @@ a { color: var(--c-accent); }
   max-width: 640px;
   width: 100%;
   margin: 0 auto;
+  overflow-x: hidden;
+  min-width: 0;
 }
 
 .btn {

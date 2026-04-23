@@ -4,6 +4,17 @@
   justify-content: space-between;
   gap: var(--sp-3);
   margin-bottom: var(--sp-4);
+  min-width: 0;
+}
+.route-tasks .route-header h1 {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 0;
+}
+.route-tasks .route-header .btn-add-task {
+  flex: 0 0 auto;
 }
 
 .onboarding-hint {
