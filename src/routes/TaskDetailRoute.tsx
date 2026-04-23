@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useAppDispatch, useAppState, useStore } from '../state/store';
 import { TaskForm, type TaskFormValues } from '../components/TaskForm';
 import { SEED_CATEGORY_IDS, SEED_STATUS_IDS } from '../storage/seed';
@@ -7,6 +7,7 @@ import './TaskDetailRoute.css';
 
 export function TaskDetailRoute() {
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
   const state = useAppState();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -18,7 +19,12 @@ export function TaskDetailRoute() {
     [isNew, id, state.tasks],
   );
 
+  const presetCategoryId = searchParams.get('categoryId');
+  const presetCategoryValid =
+    presetCategoryId != null &&
+    state.categories.some((c) => c.id === presetCategoryId);
   const defaultCategoryId =
+    (presetCategoryValid ? presetCategoryId : null) ??
     state.categories.find((c) => c.id === SEED_CATEGORY_IDS.taskToDo)?.id ??
     state.categories[0]?.id ??
     '';

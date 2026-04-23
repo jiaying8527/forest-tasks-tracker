@@ -164,7 +164,11 @@ export function TasksActiveRoute() {
     <section className="route-tasks">
       <header className="route-header">
         <h1>Tasks</h1>
-        <Link className="btn btn-primary btn-add-task" to="/task/new" aria-label="Add task">
+        <Link
+          className="btn btn-primary btn-add-task"
+          to={activeTab === 'all' ? '/task/new' : `/task/new?categoryId=${encodeURIComponent(activeTab)}`}
+          aria-label="Add task"
+        >
           <span className="btn-add-task-plus" aria-hidden="true">+</span>
           <span>Add task</span>
         </Link>
