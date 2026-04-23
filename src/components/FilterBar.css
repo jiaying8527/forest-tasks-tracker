@@ -42,3 +42,24 @@
   min-height: var(--tap-min);
   padding: 0 var(--sp-3);
 }
+.filter-copy {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  padding: 0;
+  margin-left: auto;
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-pill);
+  background: var(--c-bg-elev);
+  color: var(--c-text-muted);
+  cursor: pointer;
+  transition: background var(--motion-fast) var(--ease-out),
+              color var(--motion-fast) var(--ease-out);
+}
+.filter-copy:hover {
+  color: var(--c-text);
+  background: var(--c-surface-hover, rgba(0, 0, 0, 0.04));
+}
