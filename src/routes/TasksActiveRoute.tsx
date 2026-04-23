@@ -117,6 +117,18 @@ export function TasksActiveRoute() {
   const dispatch = useAppDispatch();
   const filters = state.prefs.lastFilters;
   const [activeTab, setActiveTab] = useState<CategoryTabValue>('all');
+  const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(
+    () => new Set(),
+  );
+
+  const toggleCategoryCollapsed = (categoryId: string) => {
+    setCollapsedCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(categoryId)) next.delete(categoryId);
+      else next.add(categoryId);
+      return next;
+    });
+  };
 
   const filtersForView = useMemo(
     () => ({
@@ -188,19 +200,48 @@ export function TasksActiveRoute() {
         </div>
       ) : activeTab === 'all' ? (
         <div className="task-groups">
-          {groups.map(({ category, items }) => (
-            <section key={category.id} className="task-group">
-              <h2 className="task-group-title">{category.name}</h2>
-              <DraggableList
-                tasks={items}
-                ariaLabel={category.name}
-                enabled={state.prefs.sortOrder === 'manual'}
-                onReorder={(orderedIds) =>
-                  dispatch({ type: 'reorderTasks', orderedIds })
-                }
-              />
-            </section>
-          ))}
+          {groups.map(({ category, items }) => {
+            const isCollapsed = collapsedCategories.has(category.id);
+            const panelId = `task-group-panel-${category.id}`;
+            return (
+              <section
+                key={category.id}
+                className={`task-group${isCollapsed ? ' is-collapsed' : ''}`}
+              >
+                <h2 className="task-group-title">
+                  <button
+                    type="button"
+                    className="task-group-toggle"
+                    aria-expanded={!isCollapsed}
+                    aria-controls={panelId}
+                    onClick={() => toggleCategoryCollapsed(category.id)}
+                  >
+                    <span className="task-group-label">
+                      <span>{category.name}</span>
+                      <span className="task-group-count" aria-hidden="true">
+                        {items.length}
+                      </span>
+                    </span>
+                    <span className="task-group-caret" aria-hidden="true">
+                      {isCollapsed ? '▸' : '▾'}
+                    </span>
+                  </button>
+                </h2>
+                {!isCollapsed ? (
+                  <div id={panelId}>
+                    <DraggableList
+                      tasks={items}
+                      ariaLabel={category.name}
+                      enabled={state.prefs.sortOrder === 'manual'}
+                      onReorder={(orderedIds) =>
+                        dispatch({ type: 'reorderTasks', orderedIds })
+                      }
+                    />
+                  </div>
+                ) : null}
+              </section>
+            );
+          })}
         </div>
       ) : (
         <DraggableList
