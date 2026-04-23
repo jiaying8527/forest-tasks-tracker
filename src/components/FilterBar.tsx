@@ -15,7 +15,11 @@ const sortOptions: { id: SortOrder; label: string }[] = [
   { id: 'manual', label: 'Manual' },
 ];
 
-export function FilterBar() {
+interface FilterBarProps {
+  endSlot?: React.ReactNode;
+}
+
+export function FilterBar({ endSlot }: FilterBarProps = {}) {
   const state = useAppState();
   const dispatch = useAppDispatch();
   const filters = state.prefs.lastFilters;
@@ -102,6 +106,7 @@ export function FilterBar() {
           Clear
         </button>
       ) : null}
+      {endSlot}
     </div>
   );
 }

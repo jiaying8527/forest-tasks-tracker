@@ -96,7 +96,7 @@ function AggregatedCanopy({ count }: { count: number }) {
     const speciesIndex = i % 4;
     return (
       <g key={i} transform={`translate(${x} ${y}) scale(${0.8 + ((i * 13) % 40) / 100})`}>
-        <circle cx="0" cy="-6" r="14" fill={canopy(speciesIndex)} />
+        <polygon points="0,-20 14,2 -14,2" fill={canopy(speciesIndex)} />
       </g>
     );
   });

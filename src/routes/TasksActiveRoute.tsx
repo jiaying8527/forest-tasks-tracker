@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useAppDispatch, useAppState } from '../state/store';
+import { useAppDispatch, useAppState, useStore } from '../state/store';
 import { applyFilters } from '../state/selectors';
 import { TaskCard } from '../components/TaskCard';
 import { FilterBar } from '../components/FilterBar';
@@ -115,8 +115,21 @@ function DraggableList({ tasks, ariaLabel, enabled, onReorder }: DraggableListPr
 export function TasksActiveRoute() {
   const state = useAppState();
   const dispatch = useAppDispatch();
+  const { showToast } = useStore();
   const filters = state.prefs.lastFilters;
   const [activeTab, setActiveTab] = useState<CategoryTabValue>('all');
+  const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(
+    () => new Set(),
+  );
+
+  const toggleCategoryCollapsed = (categoryId: string) => {
+    setCollapsedCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(categoryId)) next.delete(categoryId);
+      else next.add(categoryId);
+      return next;
+    });
+  };
 
   const filtersForView = useMemo(
     () => ({
@@ -148,11 +161,42 @@ export function TasksActiveRoute() {
   const dismissOnboarding = () =>
     dispatch({ type: 'setOnboardingDismissed', dismissed: true });
 
+  const handleCopy = async () => {
+    let text = '';
+    if (activeTab === 'all') {
+      text = groups
+        .map(({ category, items }) => {
+          const lines = items.map((t, i) => `${i + 1}. ${t.title}`).join('\n');
+          return `${category.name}:\n${lines}`;
+        })
+        .join('\n\n');
+    } else {
+      const activeCategory = state.categories.find((c) => c.id === activeTab);
+      const header = activeCategory ? `${activeCategory.name}:\n` : '';
+      const lines = tasks.map((t, i) => `${i + 1}. ${t.title}`).join('\n');
+      text = tasks.length ? `${header}${lines}` : '';
+    }
+    if (!text) {
+      showToast({ kind: 'error', message: 'Nothing to copy.' });
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast({ kind: 'success', message: 'Task list copied.' });
+    } catch {
+      showToast({ kind: 'error', message: 'Copy failed.' });
+    }
+  };
+
   return (
     <section className="route-tasks">
       <header className="route-header">
         <h1>Tasks</h1>
-        <Link className="btn btn-primary btn-add-task" to="/task/new" aria-label="Add task">
+        <Link
+          className="btn btn-primary btn-add-task"
+          to={activeTab === 'all' ? '/task/new' : `/task/new?categoryId=${encodeURIComponent(activeTab)}`}
+          aria-label="Add task"
+        >
           <span className="btn-add-task-plus" aria-hidden="true">+</span>
           <span>Add task</span>
         </Link>
@@ -176,7 +220,32 @@ export function TasksActiveRoute() {
         onChange={setActiveTab}
       />
 
-      <FilterBar />
+      <FilterBar
+        endSlot={
+          <button
+            type="button"
+            className="filter-copy"
+            onClick={handleCopy}
+            aria-label="Copy task list"
+            title="Copy task list"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              aria-hidden="true"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="9" y="9" width="11" height="11" rx="2" />
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+            </svg>
+          </button>
+        }
+      />
 
       {tasks.length === 0 ? (
         <div className="empty-state">
@@ -188,19 +257,48 @@ export function TasksActiveRoute() {
         </div>
       ) : activeTab === 'all' ? (
         <div className="task-groups">
-          {groups.map(({ category, items }) => (
-            <section key={category.id} className="task-group">
-              <h2 className="task-group-title">{category.name}</h2>
-              <DraggableList
-                tasks={items}
-                ariaLabel={category.name}
-                enabled={state.prefs.sortOrder === 'manual'}
-                onReorder={(orderedIds) =>
-                  dispatch({ type: 'reorderTasks', orderedIds })
-                }
-              />
-            </section>
-          ))}
+          {groups.map(({ category, items }) => {
+            const isCollapsed = collapsedCategories.has(category.id);
+            const panelId = `task-group-panel-${category.id}`;
+            return (
+              <section
+                key={category.id}
+                className={`task-group${isCollapsed ? ' is-collapsed' : ''}`}
+              >
+                <h2 className="task-group-title">
+                  <button
+                    type="button"
+                    className="task-group-toggle"
+                    aria-expanded={!isCollapsed}
+                    aria-controls={panelId}
+                    onClick={() => toggleCategoryCollapsed(category.id)}
+                  >
+                    <span className="task-group-label">
+                      <span>{category.name}</span>
+                      <span className="task-group-count" aria-hidden="true">
+                        {items.length}
+                      </span>
+                    </span>
+                    <span className="task-group-caret" aria-hidden="true">
+                      {isCollapsed ? '▸' : '▾'}
+                    </span>
+                  </button>
+                </h2>
+                {!isCollapsed ? (
+                  <div id={panelId}>
+                    <DraggableList
+                      tasks={items}
+                      ariaLabel={category.name}
+                      enabled={state.prefs.sortOrder === 'manual'}
+                      onReorder={(orderedIds) =>
+                        dispatch({ type: 'reorderTasks', orderedIds })
+                      }
+                    />
+                  </div>
+                ) : null}
+              </section>
+            );
+          })}
         </div>
       ) : (
         <DraggableList
